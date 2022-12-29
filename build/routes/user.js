@@ -9,4 +9,5 @@ const router = express_1.default.Router();
 router.get('/', user_1.default.getHome);
 router.post('/register', user_1.default.postRegister);
 router.post('/login', user_1.default.postLogin);
+router.get('/verifySignup/:id/:token', user_1.default.verifyEmail);
 exports.default = router;

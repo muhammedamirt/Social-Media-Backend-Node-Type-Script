@@ -9,4 +9,6 @@ router.post('/register',controllers.postRegister)
 
 router.post('/login',controllers.postLogin)
 
+router.get('/verifySignup/:id/:token',controllers.verifyEmail)
+
 export default router
