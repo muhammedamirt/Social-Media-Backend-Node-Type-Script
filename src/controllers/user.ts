@@ -44,8 +44,8 @@ export default {
                 const Url = `${process.env.BASE_URL}${user.id}/verify/${userToken.token}`;
                 sendEmail(user.email, "verify Email", Url);
 
-                res.status(200).send({sendEmail:true})
-                
+                res.status(200).send({ sendEmail: true })
+
             }
         } catch (error) {
             res.status(500).json({ message: error })
@@ -59,7 +59,11 @@ export default {
         } else {
             const passwordVerify: boolean = await bcrypt.compare(password, userData?.password)
             if (passwordVerify) {
-                res.status(200).json({ message: "login success", success: true })
+                const jwtVerificationToken = generateToken({ id: userData._id.toString() }, '30m')
+                res.status(200).cookie("userAuthentication", jwtVerificationToken, {
+                    httpOnly: false,
+                    maxAge: 600 * 1000,
+                }).json({ message: "login success", success: true })
             } else {
                 res.json({ message: "Wrong Password", passwordError: true })
             }
@@ -92,7 +96,10 @@ export default {
                 jwtVerificationToken,
                 Verify
             }
-            res.status(200).send(response)
+            res.cookie("userAuthentication", jwtVerificationToken, {
+                httpOnly: false,
+                maxAge: 600 * 1000,
+            }).status(200).send(response)
         } catch (error) {
             Verify.Status = false;
             Verify.message = "An error occurred";

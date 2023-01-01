@@ -65,7 +65,11 @@ exports.default = {
         else {
             const passwordVerify = yield bcrypt_1.default.compare(password, userData === null || userData === void 0 ? void 0 : userData.password);
             if (passwordVerify) {
-                res.status(200).json({ message: "login success", success: true });
+                const jwtVerificationToken = (0, jsonwebtoken_1.generateToken)({ id: userData._id.toString() }, '30m');
+                res.status(200).cookie("userAuthentication", jwtVerificationToken, {
+                    httpOnly: false,
+                    maxAge: 600 * 1000,
+                }).json({ message: "login success", success: true });
             }
             else {
                 res.json({ message: "Wrong Password", passwordError: true });
@@ -97,7 +101,10 @@ exports.default = {
                 jwtVerificationToken,
                 Verify
             };
-            res.status(200).send(response);
+            res.cookie("userAuthentication", jwtVerificationToken, {
+                httpOnly: false,
+                maxAge: 600 * 1000,
+            }).status(200).send(response);
         }
         catch (error) {
             Verify.Status = false;
