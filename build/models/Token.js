@@ -5,12 +5,12 @@ const tokenSchema = new mongoose_1.Schema({
     userId: {
         type: mongoose_1.Schema.Types.ObjectId,
         required: true,
-        ref: "user",
+        ref: 'user',
         unique: true
     },
     token: {
         type: String,
-        required: true,
+        required: true
     },
     createdAt: {
         type: Date,

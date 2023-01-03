@@ -21,7 +21,7 @@ app.use((0, cors_1.default)({
     ]
 }));
 app.use('/', user_1.default);
-mongoose_1.default.connect("mongodb://localhost:27017/WouldDo").then(() => {
+mongoose_1.default.connect('mongodb://localhost:27017/WouldDo').then(() => {
     console.log('database connected');
 }).catch((err) => {
     console.log(err);

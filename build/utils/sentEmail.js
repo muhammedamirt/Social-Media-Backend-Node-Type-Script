@@ -9,8 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-require("dotenv").config();
-const nodemailer = require("nodemailer");
+const dotenv_1 = require("dotenv");
+(0, dotenv_1.config)();
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const nodemailer = require('nodemailer');
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const sendEmail = (email, subject, text) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const transporter = nodemailer.createTransport({
@@ -20,19 +23,19 @@ const sendEmail = (email, subject, text) => __awaiter(void 0, void 0, void 0, fu
             secure: true,
             auth: {
                 user: process.env.USER,
-                pass: process.env.PASS,
-            },
+                pass: process.env.PASS
+            }
         });
         yield transporter.sendMail({
             from: process.env.USER,
             to: email,
-            subject: subject,
-            text: text,
+            subject,
+            text: text
         });
-        console.log("email sent successful");
+        console.log('email sent successful');
     }
     catch (error) {
-        console.log("email not sent");
+        console.log('email not sent');
         console.log(error);
     }
 });

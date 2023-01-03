@@ -1,9 +1,11 @@
-import jwt from 'jsonwebtoken';
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
+import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
-dotenv.config
+dotenv.config()
 
-export const generateToken =(payload:{id:string},expired:string)=>{
-    return jwt.sign(payload,<string>process.env.SECRET_TOKEN,{
-        expiresIn:expired
-    })
+export const generateToken = (payload: { id: string }, expired: string) => {
+  return jwt.sign(payload, <string>process.env.SECRET_TOKEN, {
+    expiresIn: expired
+  })
 }
