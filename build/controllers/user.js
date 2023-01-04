@@ -16,6 +16,7 @@ const User_1 = __importDefault(require("../models/User"));
 const Token_1 = __importDefault(require("../models/Token"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const crypto_1 = __importDefault(require("crypto"));
+// import { generateUploadUrl } from '../utils/s3'
 const jsonwebtoken_1 = require("../utils/jsonwebtoken");
 const sentEmail_1 = __importDefault(require("../utils/sentEmail"));
 const saltRounds = 10;
@@ -70,7 +71,7 @@ exports.default = {
                 res.status(200).cookie('userAuthentication', jwtVerificationToken, {
                     httpOnly: false,
                     maxAge: 600 * 1000
-                }).json({ message: 'login success', success: true });
+                }).json({ message: 'login success', success: true, token: jwtVerificationToken });
             }
             else {
                 res.json({ message: 'Wrong Password', passwordError: true });
@@ -113,5 +114,8 @@ exports.default = {
             Verify.message = 'An error occurred';
             res.status(400).send(Verify);
         }
-    })
+    }),
+    postImageUpload: (req, res) => {
+        console.log(req.body);
+    }
 };

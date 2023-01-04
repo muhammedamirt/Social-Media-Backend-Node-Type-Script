@@ -7,5 +7,6 @@ router.get('/', controllers.getHome)
 router.post('/register', controllers.postRegister)
 router.post('/login', controllers.postLogin)
 router.get('/verifySignup/:id/:token', controllers.verifyEmail)
+router.post('/imageUpload', controllers.postImageUpload)
 
 export default router

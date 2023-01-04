@@ -3,6 +3,7 @@ import User from '../models/User'
 import Token from '../models/Token'
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
+// import { generateUploadUrl } from '../utils/s3'
 import { generateToken } from '../utils/jsonwebtoken'
 import sendEmail from '../utils/sentEmail'
 const saltRounds: number = 10
@@ -64,7 +65,7 @@ export default {
         res.status(200).cookie('userAuthentication', jwtVerificationToken, {
           httpOnly: false,
           maxAge: 600 * 1000
-        }).json({ message: 'login success', success: true })
+        }).json({ message: 'login success', success: true, token: jwtVerificationToken })
       } else {
         res.json({ message: 'Wrong Password', passwordError: true })
       }
@@ -105,5 +106,8 @@ export default {
       Verify.message = 'An error occurred'
       res.status(400).send(Verify)
     }
+  },
+  postImageUpload: (req: Request, res: Response) => {
+    console.log(req.body)
   }
 }

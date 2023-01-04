@@ -11,4 +11,5 @@ router.get('/', user_1.default.getHome);
 router.post('/register', user_1.default.postRegister);
 router.post('/login', user_1.default.postLogin);
 router.get('/verifySignup/:id/:token', user_1.default.verifyEmail);
+router.post('/imageUpload', user_1.default.postImageUpload);
 exports.default = router;

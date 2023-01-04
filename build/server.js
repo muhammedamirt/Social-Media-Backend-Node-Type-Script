@@ -8,19 +8,23 @@ const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const cors_1 = __importDefault(require("cors"));
 const user_1 = __importDefault(require("./routes/user"));
+const body_parser_1 = __importDefault(require("body-parser"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
+app.use(body_parser_1.default.json());
+app.use(body_parser_1.default.urlencoded({ extended: false }));
 app.use((0, cors_1.default)({
     origin: ['http://localhost:3000'],
     methods: ['GET', 'POST'],
-    credentials: true,
-    allowedHeaders: [
-        'Content-Type',
-        'Access'
-    ]
+    credentials: true
+    // allowedHeaders: [
+    //   'Content-Type',
+    //   'Access'
+    // ]
 }));
 app.use('/', user_1.default);
+mongoose_1.default.set('strictQuery', true);
 mongoose_1.default.connect('mongodb://localhost:27017/WouldDo').then(() => {
     console.log('database connected');
 }).catch((err) => {
