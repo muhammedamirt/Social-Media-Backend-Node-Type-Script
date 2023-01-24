@@ -21,7 +21,7 @@ const sendEmail = async (email: string, subject: string, text: string) => {
       from: process.env.USER,
       to: email,
       subject,
-      text: text
+      text
     })
     console.log('email sent successful')
   } catch (error) {
