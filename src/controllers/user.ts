@@ -60,6 +60,7 @@ export default {
     }
   },
   postLogin: async (req: Request, res: Response) => {
+    console.log('login ', req.body)
     const { email, password }: { email: string, password: string } = req.body
     const userData = await User.findOne({ email })
     if (userData == null) {
