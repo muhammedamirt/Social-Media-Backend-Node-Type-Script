@@ -48,7 +48,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 
 app.use(cors({
-  origin: ['*'],
+  origin: ['https://www.woulddo.iworldecart.shop/'],
   methods: ['GET', 'POST', 'DELETE', 'PUT'],
   credentials: true
 }))
