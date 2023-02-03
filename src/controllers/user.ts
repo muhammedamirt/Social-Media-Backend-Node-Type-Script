@@ -80,17 +80,19 @@ export default {
     }
   },
   verifyEmail: async (req: Request, res: Response) => {
+    const { id, token } = req.params
     const Verify: { Status: Boolean, message: string } = {
       Status: false,
       message: ''
     }
     try {
-      const user = await User.findOne({ _id: req.params.id })
+      const user = await User.findById(id)
       if (user == null) return res.status(400).send('Invalid link')
       const tokenData = await Token.findOne({
         userId: user._id,
-        Token: req.params.token
+        Token: token
       })
+      console.log(tokenData)
       Verify.message = 'Invalid link'
       // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       if (!Token) return res.status(400).send(Verify)
@@ -108,6 +110,7 @@ export default {
         maxAge: 600 * 1000
       }).status(200).send(response)
     } catch (error) {
+      console.log(error)
       Verify.Status = false
       Verify.message = 'An error occurred'
       res.status(500).send(error)

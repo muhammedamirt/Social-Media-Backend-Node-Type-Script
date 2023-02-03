@@ -84,18 +84,22 @@ exports.default = {
         }
     }),
     verifyEmail: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const { id, token } = req.params;
         const Verify = {
             Status: false,
             message: ''
         };
         try {
-            const user = yield User_1.default.findOne({ _id: req.params.id });
+            console.log(id);
+            const user = yield User_1.default.findById(id);
+            console.log(user);
             if (user == null)
                 return res.status(400).send('Invalid link');
             const tokenData = yield Token_1.default.findOne({
                 userId: user._id,
-                Token: req.params.token
+                Token: token
             });
+            console.log(tokenData);
             Verify.message = 'Invalid link';
             // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
             if (!Token_1.default)
@@ -115,6 +119,7 @@ exports.default = {
             }).status(200).send(response);
         }
         catch (error) {
+            console.log(error);
             Verify.Status = false;
             Verify.message = 'An error occurred';
             res.status(500).send(error);
