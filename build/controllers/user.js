@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const qrcode_1 = __importDefault(require("qrcode"));
 const User_1 = __importDefault(require("../models/User"));
 const Token_1 = __importDefault(require("../models/Token"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -22,7 +23,6 @@ const sentEmail_1 = __importDefault(require("../utils/sentEmail"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const Comments_1 = __importDefault(require("../models/Comments"));
 const VideoPost_1 = __importDefault(require("../models/VideoPost"));
-const qrcode_1 = __importDefault(require("qrcode"));
 const saltRounds = 10;
 exports.default = {
     getHome: (req, res) => {
@@ -90,9 +90,7 @@ exports.default = {
             message: ''
         };
         try {
-            console.log(id);
             const user = yield User_1.default.findById(id);
-            console.log(user);
             if (user == null)
                 return res.status(400).send('Invalid link');
             const tokenData = yield Token_1.default.findOne({

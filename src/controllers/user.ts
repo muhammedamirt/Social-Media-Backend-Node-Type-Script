@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable eqeqeq */
 import { Response, Request } from 'express'
+import QRCode from 'qrcode'
 import User from '../models/User'
 import Token from '../models/Token'
 import bcrypt from 'bcrypt'
@@ -12,7 +13,6 @@ import sendEmail from '../utils/sentEmail'
 import mongoose from 'mongoose'
 import Comments from '../models/Comments'
 import VideoModel from '../models/VideoPost'
-import QRCode from 'qrcode'
 const saltRounds: number = 10
 
 export default {
