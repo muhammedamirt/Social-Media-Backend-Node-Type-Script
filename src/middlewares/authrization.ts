@@ -6,8 +6,6 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 export default async (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.body, '===1')
-
   try {
     const authHeader = req.headers.authorization
     interface ITokenPayload {
@@ -39,8 +37,6 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       }
     )
   } catch (error) {
-    console.log(error)
-
     return res.status(401).send({
       message: 'auth failed',
       success: false

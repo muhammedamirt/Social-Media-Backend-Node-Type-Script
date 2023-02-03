@@ -21,13 +21,14 @@ const jsonwebtoken_1 = require("../utils/jsonwebtoken");
 const sentEmail_1 = __importDefault(require("../utils/sentEmail"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const Comments_1 = __importDefault(require("../models/Comments"));
+const VideoPost_1 = __importDefault(require("../models/VideoPost"));
+const qrcode_1 = __importDefault(require("qrcode"));
 const saltRounds = 10;
 exports.default = {
     getHome: (req, res) => {
         res.status(200).send({ status: true });
     },
     postRegister: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log(req.body);
         try {
             const { first_name: firstName, last_name: lastName, username, email, password } = req.body;
             // const userNameExist = await User.findOne({ username })
@@ -51,7 +52,7 @@ exports.default = {
                     token: crypto_1.default.randomBytes(32).toString('hex')
                 }).save();
                 // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                const Url = `${process.env.BASE_URL}${user.id}/verify/${userToken.token}`;
+                const Url = `${process.env.BASE_URL}/${user.id}/verify/${userToken.token}`;
                 void (0, sentEmail_1.default)(user.email, 'verify Email', Url);
                 res.status(200).send({ sendEmail: true });
             }
@@ -69,6 +70,8 @@ exports.default = {
         else {
             const passwordVerify = yield bcrypt_1.default.compare(password, userData === null || userData === void 0 ? void 0 : userData.password);
             if (passwordVerify) {
+                userData.isLogged = true;
+                yield userData.save();
                 const jwtVerificationToken = (0, jsonwebtoken_1.generateToken)({ id: userData._id.toString() }, '30m');
                 res.status(200).cookie('userAuthentication', jwtVerificationToken, {
                     httpOnly: false,
@@ -81,7 +84,6 @@ exports.default = {
         }
     }),
     verifyEmail: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log(req.params);
         const Verify = {
             Status: false,
             message: ''
@@ -98,7 +100,7 @@ exports.default = {
             // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
             if (!Token_1.default)
                 return res.status(400).send(Verify);
-            yield User_1.default.updateOne({ _id: user._id, verified: true });
+            yield User_1.default.updateOne({ _id: user._id }, { verified: true });
             yield Token_1.default.findByIdAndRemove(tokenData === null || tokenData === void 0 ? void 0 : tokenData._id);
             Verify.Status = true;
             Verify.message = 'email verified successful';
@@ -115,11 +117,10 @@ exports.default = {
         catch (error) {
             Verify.Status = false;
             Verify.message = 'An error occurred';
-            res.status(500).send(Verify);
+            res.status(500).send(error);
         }
     }),
     postImageUpload: (req, res) => {
-        console.log(req.body);
     },
     getUserData: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const userData = yield User_1.default.findById(req.params.id);
@@ -135,8 +136,7 @@ exports.default = {
         });
         const userData = yield User_1.default.findById(req.params.id);
         userData === null || userData === void 0 ? void 0 : userData.Posts.push(post === null || post === void 0 ? void 0 : post._id);
-        const postStatus = yield (userData === null || userData === void 0 ? void 0 : userData.save());
-        console.log(postStatus);
+        yield (userData === null || userData === void 0 ? void 0 : userData.save());
         res.status(200).send({ status: true });
     }),
     getUserPosts: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -169,12 +169,12 @@ exports.default = {
                     posts: { $arrayElemAt: ['$posts', 0] }
                 }
             }
-        ]).then(data => {
+        ]).sort({ date: -1 }).then(data => {
             res.status(200).send(data);
-        }).catch(err => console.log(err));
+        }).catch(err => res.json(err));
     }),
     fetchFollowersPosts: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const userPosts = yield Posts_1.default.find().populate('userId');
+        const userPosts = yield Posts_1.default.find().populate('userId').sort({ date: -1 });
         res.status(200).send(userPosts);
     }),
     fetchSpecificUser: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -183,8 +183,7 @@ exports.default = {
             res.status(200).send(userData);
         }
         catch (error) {
-            console.log(error, '=============');
-            res.send(null);
+            res.send(error);
         }
     }),
     getLikePost: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -205,7 +204,7 @@ exports.default = {
             }
         }
         catch (err) {
-            console.log(err);
+            res.status(500).json(err);
         }
     }),
     getFollowUer: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -231,7 +230,7 @@ exports.default = {
             }
         }
         catch (err) {
-            console.log(err);
+            res.status(500).json(err);
         }
     }),
     editProfile: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -256,7 +255,7 @@ exports.default = {
             }
         }
         catch (error) {
-            console.log(error);
+            res.status(500).json(error);
         }
     }),
     getAddCommentToPost: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -280,7 +279,7 @@ exports.default = {
             }
         }
         catch (err) {
-            console.log(err);
+            res.status(500).json(err);
         }
     }),
     getUserFollowers: (req, res) => {
@@ -317,14 +316,13 @@ exports.default = {
                 }
             ]).then(data => {
                 res.status(200).send(data);
-            }).catch(err => console.log(err));
+            }).catch(err => res.json(err));
         }
         catch (err) {
-            console.log(err);
+            res.status(500).json(err);
         }
     },
     getUserFollowing: (req, res) => {
-        console.log(req.params.userId);
         try {
             User_1.default.aggregate([
                 {
@@ -358,14 +356,13 @@ exports.default = {
                 }
             ]).then(data => {
                 res.status(200).send(data);
-            }).catch(err => console.log(err));
+            }).catch(err => res.json(err));
         }
         catch (err) {
-            console.log(err);
+            res.status(500).json(err);
         }
     },
     userLogout: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log(req.params.userId);
         try {
             const user = yield User_1.default.findById(req.params.userId);
             if (user) {
@@ -383,7 +380,6 @@ exports.default = {
     }),
     postUserSearch: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            console.log(req.body);
             const { searchData: searchExpression } = req.body;
             const searchData = yield User_1.default.find({ username: { $regex: searchExpression, $options: 'i' } });
             if (searchData) {
@@ -398,20 +394,17 @@ exports.default = {
         }
     }),
     forgotPassword: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log(req.body);
         try {
             const { email } = req.body;
             const user = yield User_1.default.findOne({ email });
-            console.log(user);
             if (user) {
-                const userToken = yield new Token_1.default({
+                const userToken = new Token_1.default({
                     userId: user._id,
                     token: crypto_1.default.randomBytes(32).toString('hex')
-                }).save();
-                const Url = `${process.env.BASE_URL}${user.id}/changePassword/${userToken.token}`;
-                console.log('hello');
+                });
+                yield userToken.save();
+                const Url = `${process.env.BASE_URL}/${user.id}/changePassword/${userToken.token}`;
                 void (0, sentEmail_1.default)(user.email, 'Click Link and change password', Url);
-                console.log('hello 1');
                 res.status(200).send({ status: true, message: 'email sent successfully' });
             }
             else {
@@ -423,7 +416,6 @@ exports.default = {
         }
     }),
     changePassword: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log(req.body);
         try {
             const { userId, token, newPassword } = req.body;
             const tokenData = yield Token_1.default.findOne({ token });
@@ -449,7 +441,6 @@ exports.default = {
         }
     }),
     savePost: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log(req.body);
         try {
             const userId = req.params.userId;
             const { postId } = req.body;
@@ -457,11 +448,11 @@ exports.default = {
             if (user) {
                 if (!user.saved.includes(postId)) {
                     yield user.updateOne({ $push: { saved: new mongoose_1.default.Types.ObjectId(postId) } });
-                    res.json({ Message: 'post saved successfully', success: true });
+                    res.json({ Message: 'post saved successfully', success: true, saved: true });
                 }
                 else {
                     yield user.updateOne({ $pull: { saved: new mongoose_1.default.Types.ObjectId(postId) } });
-                    res.json({ Message: 'post unsaved successfully', success: true });
+                    res.json({ Message: 'post unsaved successfully', success: true, unsaved: true });
                 }
             }
             else {
@@ -511,6 +502,97 @@ exports.default = {
                 }
             ]);
             res.status(200).json(result);
+        }
+        catch (error) {
+            res.status(500).json(error);
+        }
+    }),
+    getSinglePost: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const { postId } = req.params;
+            const result = yield Posts_1.default.findOne({ _id: new mongoose_1.default.Types.ObjectId(postId) }).populate('userId');
+            if (result) {
+                res.status(200).json(result);
+            }
+            else {
+                res.status(404).json({ noPost: true });
+            }
+        }
+        catch (error) {
+            res.status(500).json(error);
+        }
+    }),
+    createQrCode: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const profileUrl = `${process.env.BASE_URL}/profile/${req.params.userId}`;
+            const profileQrUrl = yield qrcode_1.default.toDataURL(profileUrl);
+            res.status(200).json({ profileQrUrl, profileUrl });
+        }
+        catch (error) {
+            res.status(500).json(error);
+        }
+    }),
+    googleLogin: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const userData = yield User_1.default.findOne({ email: req.body.email, googleAuth: true });
+            if (userData) {
+                const jwtVerificationToken = (0, jsonwebtoken_1.generateToken)({ id: userData._id.toString() }, '30m');
+                res.status(200).json({ token: jwtVerificationToken, id: userData._id, authStatus: true });
+            }
+            else {
+                res.status(200).json({ userData, authStatus: false });
+            }
+        }
+        catch (error) {
+            res.status(500).json(error);
+        }
+    }),
+    googleSignup: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const userData = yield User_1.default.findOne({ email: req.body.email, googleAuth: true });
+            if (userData) {
+                res.status(200).json({ alreadyRegistered: true });
+            }
+            else {
+                const result = yield User_1.default.create({
+                    email: req.body.email,
+                    first_name: req.body.name,
+                    username: req.body.name,
+                    picture: req.body.picture,
+                    googleAuth: true
+                });
+                const jwtVerificationToken = (0, jsonwebtoken_1.generateToken)({ id: result._id.toString() }, '30m');
+                res.status(200).json({ token: jwtVerificationToken, id: result._id, authStatus: true });
+            }
+        }
+        catch (error) {
+            res.status(500).json(error);
+        }
+    }),
+    uploadVideo: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const { url, userId, captions } = req.body;
+        try {
+            const newShort = new VideoPost_1.default({
+                url,
+                userId,
+                captions
+            });
+            yield newShort.save();
+            res
+                .status(201)
+                .json({ status: true, message: 'Short added successfully' });
+        }
+        catch (error) {
+            res.status(500).json(error);
+        }
+    }),
+    allVideos: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const allShorts = yield VideoPost_1.default
+                .find()
+                .populate('userId')
+                .sort({ createdAt: -1 });
+            res.status(200).json(allShorts);
         }
         catch (error) {
             res.status(500).json(error);

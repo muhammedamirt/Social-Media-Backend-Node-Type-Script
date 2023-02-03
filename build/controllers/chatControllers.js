@@ -16,12 +16,22 @@ exports.findChat = exports.userChats = exports.createChat = void 0;
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 const Chat_1 = __importDefault(require("../models/Chat"));
 const createChat = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const newChat = new Chat_1.default({
-        members: [req.body.senderId, req.body.receiverId]
-    });
     try {
-        const result = yield newChat.save();
-        res.status(200).json(result);
+        const chatExist = yield Chat_1.default.findOne({
+            members: {
+                $all: [req.body.senderId, req.body.receiverId]
+            }
+        });
+        if (chatExist !== null) {
+            res.status(200).json({ chatExist: true });
+        }
+        else {
+            const newChat = new Chat_1.default({
+                members: [req.body.senderId, req.body.receiverId]
+            });
+            const result = yield newChat.save();
+            res.status(200).json(result);
+        }
     }
     catch (error) {
         res.status(500).json(error);
@@ -32,7 +42,7 @@ const userChats = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const chat = yield Chat_1.default.find({
             members: { $in: [req.params.userId] }
-        });
+        }).sort({ createdAt: -1 });
         res.status(200).json(chat);
     }
     catch (error) {

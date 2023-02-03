@@ -11,6 +11,8 @@ import { generateToken } from '../utils/jsonwebtoken'
 import sendEmail from '../utils/sentEmail'
 import mongoose from 'mongoose'
 import Comments from '../models/Comments'
+import VideoModel from '../models/VideoPost'
+import QRCode from 'qrcode'
 const saltRounds: number = 10
 
 export default {
@@ -18,7 +20,6 @@ export default {
     res.status(200).send({ status: true })
   },
   postRegister: async (req: Request, res: Response) => {
-    console.log(req.body)
     try {
       const {
         first_name: firstName,
@@ -49,7 +50,7 @@ export default {
         }).save()
 
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        const Url: string = `${process.env.BASE_URL}${user.id}/verify/${userToken.token}`
+        const Url: string = `${process.env.BASE_URL}/${user.id}/verify/${userToken.token}`
         void sendEmail(user.email, 'verify Email', Url)
 
         res.status(200).send({ sendEmail: true })
@@ -66,6 +67,8 @@ export default {
     } else {
       const passwordVerify: boolean = await bcrypt.compare(password, userData?.password)
       if (passwordVerify) {
+        userData.isLogged = true
+        await userData.save()
         const jwtVerificationToken = generateToken({ id: userData._id.toString() }, '30m')
         res.status(200).cookie('userAuthentication', jwtVerificationToken, {
           httpOnly: false,
@@ -77,7 +80,6 @@ export default {
     }
   },
   verifyEmail: async (req: Request, res: Response) => {
-    console.log(req.params)
     const Verify: { Status: Boolean, message: string } = {
       Status: false,
       message: ''
@@ -89,11 +91,10 @@ export default {
         userId: user._id,
         Token: req.params.token
       })
-
       Verify.message = 'Invalid link'
       // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       if (!Token) return res.status(400).send(Verify)
-      await User.updateOne({ _id: user._id, verified: true })
+      await User.updateOne({ _id: user._id }, { verified: true })
       await Token.findByIdAndRemove(tokenData?._id)
       Verify.Status = true
       Verify.message = 'email verified successful'
@@ -109,11 +110,10 @@ export default {
     } catch (error) {
       Verify.Status = false
       Verify.message = 'An error occurred'
-      res.status(500).send(Verify)
+      res.status(500).send(error)
     }
   },
   postImageUpload: (req: Request, res: Response) => {
-    console.log(req.body)
   },
   getUserData: async (req: Request, res: Response) => {
     const userData = await User.findById(req.params.id)
@@ -129,8 +129,7 @@ export default {
     })
     const userData = await User.findById(req.params.id)
     userData?.Posts.push(post?._id)
-    const postStatus = await userData?.save()
-    console.log(postStatus)
+    await userData?.save()
     res.status(200).send({ status: true })
   },
   getUserPosts: async (req: Request, res: Response) => {
@@ -163,12 +162,12 @@ export default {
           posts: { $arrayElemAt: ['$posts', 0] }
         }
       }
-    ]).then(data => {
+    ]).sort({ date: -1 }).then(data => {
       res.status(200).send(data)
-    }).catch(err => console.log(err))
+    }).catch(err => res.json(err))
   },
   fetchFollowersPosts: async (req: Request, res: Response) => {
-    const userPosts = await PostImages.find().populate('userId')
+    const userPosts = await PostImages.find().populate('userId').sort({ date: -1 })
     res.status(200).send(userPosts)
   },
   fetchSpecificUser: async (req: Request, res: Response) => {
@@ -176,8 +175,7 @@ export default {
       const userData = await User.findOne({ _id: req.params.id })
       res.status(200).send(userData)
     } catch (error) {
-      console.log(error, '=============')
-      res.send(null)
+      res.send(error)
     }
   },
   getLikePost: async (req: Request, res: Response) => {
@@ -196,7 +194,7 @@ export default {
         return res.json({ Message: 'post disliked successfully', success: true })
       }
     } catch (err) {
-      console.log(err)
+      res.status(500).json(err)
     }
   },
   getFollowUer: async (req: Request, res: Response) => {
@@ -219,7 +217,7 @@ export default {
         }
       }
     } catch (err) {
-      console.log(err)
+      res.status(500).json(err)
     }
   },
   editProfile: async (req: Request, res: Response) => {
@@ -252,7 +250,7 @@ export default {
         res.send({ status: false, message: 'something went wrong' })
       }
     } catch (error) {
-      console.log(error)
+      res.status(500).json(error)
     }
   },
   getAddCommentToPost: async (req: Request, res: Response) => {
@@ -274,7 +272,7 @@ export default {
         res.send({ err: true })
       }
     } catch (err) {
-      console.log(err)
+      res.status(500).json(err)
     }
   },
   getUserFollowers: (req: Request, res: Response) => {
@@ -311,13 +309,12 @@ export default {
         }
       ]).then(data => {
         res.status(200).send(data)
-      }).catch(err => console.log(err))
+      }).catch(err => res.json(err))
     } catch (err) {
-      console.log(err)
+      res.status(500).json(err)
     }
   },
   getUserFollowing: (req: Request, res: Response) => {
-    console.log(req.params.userId)
     try {
       User.aggregate([
         {
@@ -351,13 +348,12 @@ export default {
         }
       ]).then(data => {
         res.status(200).send(data)
-      }).catch(err => console.log(err))
+      }).catch(err => res.json(err))
     } catch (err) {
-      console.log(err)
+      res.status(500).json(err)
     }
   },
   userLogout: async (req: Request, res: Response) => {
-    console.log(req.params.userId)
     try {
       const user = await User.findById(req.params.userId)
       if (user) {
@@ -373,7 +369,6 @@ export default {
   },
   postUserSearch: async (req: Request, res: Response) => {
     try {
-      console.log(req.body)
       const { searchData: searchExpression } = req.body
       const searchData = await User.find({ username: { $regex: searchExpression, $options: 'i' } })
       if (searchData) {
@@ -386,20 +381,17 @@ export default {
     }
   },
   forgotPassword: async (req: Request, res: Response) => {
-    console.log(req.body)
     try {
       const { email } = req.body
       const user = await User.findOne({ email })
-      console.log(user)
       if (user) {
-        const userToken = await new Token({
+        const userToken = new Token({
           userId: user._id,
           token: crypto.randomBytes(32).toString('hex')
-        }).save()
-        const Url: string | undefined = `${process.env.BASE_URL}${user.id}/changePassword/${userToken.token}`
-        console.log('hello')
+        })
+        await userToken.save()
+        const Url: string | undefined = `${process.env.BASE_URL}/${user.id}/changePassword/${userToken.token}`
         void sendEmail(user.email, 'Click Link and change password', Url)
-        console.log('hello 1')
         res.status(200).send({ status: true, message: 'email sent successfully' })
       } else {
         res.json({ status: false, message: 'user not Found' })
@@ -409,7 +401,6 @@ export default {
     }
   },
   changePassword: async (req: Request, res: Response) => {
-    console.log(req.body)
     try {
       const { userId, token, newPassword } = req.body
       const tokenData = await Token.findOne({ token })
@@ -432,7 +423,6 @@ export default {
     }
   },
   savePost: async (req: Request, res: Response) => {
-    console.log(req.body)
     try {
       const userId: string = req.params.userId
       const { postId } = req.body
@@ -440,10 +430,10 @@ export default {
       if (user) {
         if (!user.saved.includes(postId)) {
           await user.updateOne({ $push: { saved: new mongoose.Types.ObjectId(postId) } })
-          res.json({ Message: 'post saved successfully', success: true })
+          res.json({ Message: 'post saved successfully', success: true, saved: true })
         } else {
           await user.updateOne({ $pull: { saved: new mongoose.Types.ObjectId(postId) } })
-          res.json({ Message: 'post unsaved successfully', success: true })
+          res.json({ Message: 'post unsaved successfully', success: true, unsaved: true })
         }
       } else {
         res.json({ noUser: true })
@@ -491,6 +481,88 @@ export default {
         }
       ])
       res.status(200).json(result)
+    } catch (error) {
+      res.status(500).json(error)
+    }
+  },
+  getSinglePost: async (req: Request, res: Response) => {
+    try {
+      const { postId } = req.params
+      const result = await PostImages.findOne({ _id: new mongoose.Types.ObjectId(postId) }).populate('userId')
+      if (result) {
+        res.status(200).json(result)
+      } else {
+        res.status(404).json({ noPost: true })
+      }
+    } catch (error) {
+      res.status(500).json(error)
+    }
+  },
+  createQrCode: async (req: Request, res: Response) => {
+    try {
+      const profileUrl = `${process.env.BASE_URL}/profile/${req.params.userId}`
+      const profileQrUrl = await QRCode.toDataURL(profileUrl)
+      res.status(200).json({ profileQrUrl, profileUrl })
+    } catch (error) {
+      res.status(500).json(error)
+    }
+  },
+  googleLogin: async (req: Request, res: Response) => {
+    try {
+      const userData = await User.findOne({ email: req.body.email, googleAuth: true })
+      if (userData) {
+        const jwtVerificationToken = generateToken({ id: userData._id.toString() }, '30m')
+        res.status(200).json({ token: jwtVerificationToken, id: userData._id, authStatus: true })
+      } else {
+        res.status(200).json({ userData, authStatus: false })
+      }
+    } catch (error) {
+      res.status(500).json(error)
+    }
+  },
+  googleSignup: async (req: Request, res: Response) => {
+    try {
+      const userData = await User.findOne({ email: req.body.email, googleAuth: true })
+      if (userData) {
+        res.status(200).json({ alreadyRegistered: true })
+      } else {
+        const result = await User.create({
+          email: req.body.email,
+          first_name: req.body.name,
+          username: req.body.name,
+          picture: req.body.picture,
+          googleAuth: true
+        })
+        const jwtVerificationToken = generateToken({ id: result._id.toString() }, '30m')
+        res.status(200).json({ token: jwtVerificationToken, id: result._id, authStatus: true })
+      }
+    } catch (error) {
+      res.status(500).json(error)
+    }
+  },
+  uploadVideo: async (req: Request, res: Response) => {
+    const { url, userId, captions } = req.body
+    try {
+      const newShort = new VideoModel({
+        url,
+        userId,
+        captions
+      })
+      await newShort.save()
+      res
+        .status(201)
+        .json({ status: true, message: 'Short added successfully' })
+    } catch (error) {
+      res.status(500).json(error)
+    }
+  },
+  allVideos: async (req: Request, res: Response) => {
+    try {
+      const allShorts = await VideoModel
+        .find()
+        .populate('userId')
+        .sort({ createdAt: -1 })
+      res.status(200).json(allShorts)
     } catch (error) {
       res.status(500).json(error)
     }

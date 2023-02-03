@@ -18,7 +18,6 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 exports.default = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(req.body, '===1');
     try {
         const authHeader = req.headers.authorization;
         if (authHeader == null) {
@@ -43,7 +42,6 @@ exports.default = (req, res, next) => __awaiter(void 0, void 0, void 0, function
         });
     }
     catch (error) {
-        console.log(error);
         return res.status(401).send({
             message: 'auth failed',
             success: false

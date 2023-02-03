@@ -10,7 +10,6 @@ const userSchema = new mongoose_1.Schema({
     },
     last_name: {
         type: String,
-        required: true,
         trim: true,
         text: true
     },
@@ -26,8 +25,7 @@ const userSchema = new mongoose_1.Schema({
         trim: true
     },
     password: {
-        type: String,
-        required: true
+        type: String
     },
     picture: {
         type: String,
@@ -35,7 +33,7 @@ const userSchema = new mongoose_1.Schema({
     },
     cover: {
         type: String,
-        default: 'https://www.lonelyplanet.fr/sites/lonelyplanet/files/styles/manual_crop/public/media/destination/slider/mobile/gettyrf_461358497.jpg?itok=m-6c7QZ0'
+        default: 'https://res.cloudinary.com/dvh94pdmb/image/upload/v1675311875/default-cover_p7wwym.png'
     },
     country: {
         type: String,
@@ -61,10 +59,10 @@ const userSchema = new mongoose_1.Schema({
         type: Boolean,
         default: false
     },
-    // friends: {
-    //   type: Array,
-    //   default: []
-    // },
+    googleAuth: {
+        type: Boolean,
+        default: false
+    },
     following: {
         type: Array,
         default: []

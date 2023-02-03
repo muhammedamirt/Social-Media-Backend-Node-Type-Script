@@ -2,7 +2,6 @@ import { config } from 'dotenv'
 config()
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const nodemailer = require('nodemailer')
-
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const sendEmail = async (email: string, subject: string, text: string) => {
   try {
@@ -23,10 +22,8 @@ const sendEmail = async (email: string, subject: string, text: string) => {
       subject,
       text
     })
-    console.log('email sent successful')
   } catch (error) {
-    console.log('email not sent')
-    console.log(error)
+    return error
   }
 }
 

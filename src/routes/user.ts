@@ -27,5 +27,11 @@ router.put('/forgotPassword', controllers.forgotPassword)
 router.put('/changePassword', controllers.changePassword)
 router.put('/savePost/:userId', controllers.savePost)
 router.get('/fetchSavedPosts/:userId', controllers.getSavedPost)
+router.get('/onePost/:postId', controllers.getSinglePost)
+router.get('/qrCode/:userId', controllers.createQrCode)
+router.post('/googleLogin', controllers.googleLogin)
+router.post('/googleSignup', controllers.googleSignup)
+router.post('/uploadVideoFile', controllers.uploadVideo)
+router.get('/getAllVideos', controllers.allVideos)
 
 export default router

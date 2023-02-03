@@ -7,10 +7,9 @@ interface token extends Document {
 }
 const tokenSchema: Schema = new Schema({
   userId: {
-    type: Schema.Types.ObjectId,
+    type: String,
     required: true,
-    ref: 'user',
-    unique: true
+    ref: 'user'
   },
   token: {
     type: String,

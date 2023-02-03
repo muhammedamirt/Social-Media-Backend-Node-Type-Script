@@ -5,7 +5,6 @@ import { generateToken } from '../utils/jsonwebtoken'
 import User from '../models/User'
 
 export const adminLogin = async (req: Request, res: Response) => {
-  console.log(req.body)
   const { email, password }: { email: string, password: string } = req.body
   const adminData = await Admin.findOne({ email })
   if (adminData == null) {
@@ -32,14 +31,12 @@ export const getAllUsers = async (req: Request, res: Response) => {
       res.status(200).json(users)
     }
   } catch (err) {
-    console.log(err)
     res.status(500).json(err)
   }
 }
 
 export const getIsBlocked = async (req: Request, res: Response) => {
   try {
-    console.log(req.params.userId)
     const user = await User.findOne({ _id: req.params.userId })
     if (user !== null) {
       if (!user?.isBlocked) {
@@ -52,6 +49,17 @@ export const getIsBlocked = async (req: Request, res: Response) => {
         res.status(200).json({ userUnBlocked: true })
       }
     }
+  } catch (error) {
+    res.status(500).json(error)
+  }
+}
+
+export const getActiveInactiveUsers = async (req: Request, res: Response) => {
+  try {
+    const activeUsersInactive = await User.aggregate([
+      { $match: { isLogged: false } }
+    ])
+    res.json(activeUsersInactive)
   } catch (error) {
     res.status(500).json(error)
   }
