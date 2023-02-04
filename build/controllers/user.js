@@ -62,6 +62,7 @@ exports.default = {
         }
     }),
     postLogin: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log('login ', req.body);
         const { email, password } = req.body;
         const userData = yield User_1.default.findOne({ email });
         if (userData == null) {

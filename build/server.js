@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
-const cors_1 = __importDefault(require("cors"));
+// import cors from 'cors'
 const user_1 = __importDefault(require("./routes/user"));
 const admin_1 = __importDefault(require("./routes/admin"));
 const chatRoute_1 = __importDefault(require("./routes/chatRoute"));
@@ -17,42 +17,24 @@ const reportPostRoute_1 = __importDefault(require("./routes/reportPostRoute"));
 const body_parser_1 = __importDefault(require("body-parser"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-// const io = require('socket.io')(8800, {
-//   cors: {
-//     origin: process.env.BASE_URL
-//   }
-// })
-// let activeUser: any[] = []
-// io.on('connection', (socket: any) => {
-//   socket.on('new-user-add', (newUserId: string) => {
-//     if (!activeUser.some((user) => user.userId === newUserId)) {
-//       activeUser.push({
-//         userId: newUserId,
-//         socketId: socket.id
-//       })
-//     }
-//     io.emit('get-user', activeUser)
-//   })
-//   socket.on('send-message', (data: any) => {
-//     const { receiverId } = data
-//     const user = activeUser.find((user) => user.userId === receiverId)
-//     if (user) {
-//       io.to(user.socketId).emit('receive-message', data)
-//     }
-//   })
-//   socket.on('disconnect', () => {
-//     activeUser = activeUser.filter((user) => user.socketId !== socket.id)
-//     io.emit('get-user', activeUser)
-//   })
-// })
 app.use(express_1.default.json());
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: false }));
-app.use((0, cors_1.default)({
-    origin: ['*'],
-    methods: ['GET', 'POST', 'DELETE', 'PUT'],
-    credentials: true
-}));
+// app.use(cors({
+//   origin: ['https://www.woulddo.iworldecart.shop/'],
+//   methods: ['GET', 'POST', 'DELETE', 'PUT'],
+//   credentials: true
+// }))
+app.use(function (req, res, next) {
+    // Website you wish to allow to connect
+    res.setHeader('Access-Control-Allow-Origin', 'https://www.woulddo.iworldecart.shop');
+    // Request methods you wish to allow
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    // Pass to next layer of middleware
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    next();
+});
 app.use('/', user_1.default);
 app.use('/admin', admin_1.default);
 app.use('/chat', chatRoute_1.default);

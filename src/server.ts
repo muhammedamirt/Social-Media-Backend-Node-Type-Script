@@ -3,7 +3,7 @@
 import dotenv from 'dotenv'
 import express, { Application } from 'express'
 import mongoose from 'mongoose'
-import cors from 'cors'
+// import cors from 'cors'
 import userRoute from './routes/user'
 import adminRoute from './routes/admin'
 import chatRoute from './routes/chatRoute'
@@ -13,45 +13,29 @@ import bodyParser from 'body-parser'
 dotenv.config()
 const app: Application = express()
 
-// const io = require('socket.io')(8800, {
-//   cors: {
-//     origin: process.env.BASE_URL
-//   }
-// })
-// let activeUser: any[] = []
-
-// io.on('connection', (socket: any) => {
-//   socket.on('new-user-add', (newUserId: string) => {
-//     if (!activeUser.some((user) => user.userId === newUserId)) {
-//       activeUser.push({
-//         userId: newUserId,
-//         socketId: socket.id
-//       })
-//     }
-//     io.emit('get-user', activeUser)
-//   })
-//   socket.on('send-message', (data: any) => {
-//     const { receiverId } = data
-//     const user = activeUser.find((user) => user.userId === receiverId)
-//     if (user) {
-//       io.to(user.socketId).emit('receive-message', data)
-//     }
-//   })
-//   socket.on('disconnect', () => {
-//     activeUser = activeUser.filter((user) => user.socketId !== socket.id)
-//     io.emit('get-user', activeUser)
-//   })
-// })
-
 app.use(express.json())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 
-app.use(cors({
-  origin: ['https://www.woulddo.iworldecart.shop/'],
-  methods: ['GET', 'POST', 'DELETE', 'PUT'],
-  credentials: true
-}))
+// app.use(cors({
+//   origin: ['https://www.woulddo.iworldecart.shop/'],
+//   methods: ['GET', 'POST', 'DELETE', 'PUT'],
+//   credentials: true
+// }))
+
+app.use(function (req, res, next) {
+  // Website you wish to allow to connect
+  res.setHeader('Access-Control-Allow-Origin', 'https://www.woulddo.iworldecart.shop')
+
+  // Request methods you wish to allow
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+  // Pass to next layer of middleware
+  res.setHeader('Access-Control-Allow-Credentials', 'true')
+
+  next()
+})
 
 app.use('/', userRoute)
 app.use('/admin', adminRoute)
