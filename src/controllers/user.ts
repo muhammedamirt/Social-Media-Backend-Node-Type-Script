@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable eqeqeq */
 import { Response, Request } from 'express'
-import QRCode from 'qrcode'
+// import QRCode from 'qrcode'
 import User from '../models/User'
 import Token from '../models/Token'
 import bcrypt from 'bcrypt'
@@ -502,15 +502,15 @@ export default {
       res.status(500).json(error)
     }
   },
-  createQrCode: async (req: Request, res: Response) => {
-    try {
-      const profileUrl = `${process.env.BASE_URL}/profile/${req.params.userId}`
-      const profileQrUrl = await QRCode.toDataURL(profileUrl)
-      res.status(200).json({ profileQrUrl, profileUrl })
-    } catch (error) {
-      res.status(500).json(error)
-    }
-  },
+  // createQrCode: async (req: Request, res: Response) => {
+  //   try {
+  //     const profileUrl = `${process.env.BASE_URL}/profile/${req.params.userId}`
+  //     const profileQrUrl = await QRCode.toDataURL(profileUrl)
+  //     res.status(200).json({ profileQrUrl, profileUrl })
+  //   } catch (error) {
+  //     res.status(500).json(error)
+  //   }
+  // },
   googleLogin: async (req: Request, res: Response) => {
     try {
       const userData = await User.findOne({ email: req.body.email, googleAuth: true })

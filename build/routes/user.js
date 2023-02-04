@@ -32,7 +32,7 @@ router.put('/changePassword', user_1.default.changePassword);
 router.put('/savePost/:userId', user_1.default.savePost);
 router.get('/fetchSavedPosts/:userId', user_1.default.getSavedPost);
 router.get('/onePost/:postId', user_1.default.getSinglePost);
-router.get('/qrCode/:userId', user_1.default.createQrCode);
+// router.get('/qrCode/:userId', controllers.createQrCode)
 router.post('/googleLogin', user_1.default.googleLogin);
 router.post('/googleSignup', user_1.default.googleSignup);
 router.post('/uploadVideoFile', user_1.default.uploadVideo);

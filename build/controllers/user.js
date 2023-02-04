@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const qrcode_1 = __importDefault(require("qrcode"));
+// import QRCode from 'qrcode'
 const User_1 = __importDefault(require("../models/User"));
 const Token_1 = __importDefault(require("../models/Token"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -526,16 +526,15 @@ exports.default = {
             res.status(500).json(error);
         }
     }),
-    createQrCode: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        try {
-            const profileUrl = `${process.env.BASE_URL}/profile/${req.params.userId}`;
-            const profileQrUrl = yield qrcode_1.default.toDataURL(profileUrl);
-            res.status(200).json({ profileQrUrl, profileUrl });
-        }
-        catch (error) {
-            res.status(500).json(error);
-        }
-    }),
+    // createQrCode: async (req: Request, res: Response) => {
+    //   try {
+    //     const profileUrl = `${process.env.BASE_URL}/profile/${req.params.userId}`
+    //     const profileQrUrl = await QRCode.toDataURL(profileUrl)
+    //     res.status(200).json({ profileQrUrl, profileUrl })
+    //   } catch (error) {
+    //     res.status(500).json(error)
+    //   }
+    // },
     googleLogin: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const userData = yield User_1.default.findOne({ email: req.body.email, googleAuth: true });
