@@ -46,8 +46,10 @@ app.use('/messages', messageRouter)
 app.use('/report', reportRoute)
 
 mongoose.set('strictQuery', true)
+const mongoURL = process.env.MONGO_URL ?? ''
 
-mongoose.connect('mongodb://localhost:27017/WouldDo').then(() => {
+mongoose.connect(mongoURL).then(() => {
+  console.log('database connected')
 }).catch((err) => {
   return err
 })

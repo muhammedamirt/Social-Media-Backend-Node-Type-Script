@@ -2,6 +2,7 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
@@ -42,7 +43,9 @@ app.use('/chat', chatRoute_1.default);
 app.use('/messages', messageRouter_1.default);
 app.use('/report', reportPostRoute_1.default);
 mongoose_1.default.set('strictQuery', true);
-mongoose_1.default.connect('mongodb://localhost:27017/WouldDo').then(() => {
+const mongoURL = (_a = process.env.MONGO_URL) !== null && _a !== void 0 ? _a : '';
+mongoose_1.default.connect(mongoURL).then(() => {
+    console.log('database connected');
 }).catch((err) => {
     return err;
 });
