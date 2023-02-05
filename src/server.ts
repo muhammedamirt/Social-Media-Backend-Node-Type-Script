@@ -23,11 +23,19 @@ app.use(cors({
   credentials: true
 }))
 
-// app.use(function (req, res, next) {
-//   res.header('Access-Control-Allow-Origin', '*')
-//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
-//   next()
-// })
+app.use(function (req, res, next) {
+  // Website you wish to allow to connect
+  res.setHeader('Access-Control-Allow-Origin', 'https://www.connect.techmart.tech')
+
+  // Request methods you wish to allow
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+  // Pass to next layer of middleware
+  res.setHeader('Access-Control-Allow-Credentials', 'true')
+
+  next()
+})
 
 app.use('/', userRoute)
 app.use('/admin', adminRoute)
