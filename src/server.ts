@@ -13,31 +13,13 @@ import bodyParser from 'body-parser'
 dotenv.config()
 const app: Application = express()
 
+app.use(cors({
+  origin: 'https://www.woulddo.iworldecart.shop'
+}))
+
 app.use(express.json())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
-
-// app.use(cors({
-//   origin: ['https://www.woulddo.iworldecart.shop/'],
-//   methods: ['GET', 'POST', 'DELETE', 'PUT'],
-//   credentials: true
-// }))
-
-// app.use(function (req, res, next) {
-//   // Website you wish to allow to connect
-//   res.setHeader('Access-Control-Allow-Origin', 'https://www.woulddo.iworldecart.shop')
-
-//   // Request methods you wish to allow
-//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
-
-//   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-//   // Pass to next layer of middleware
-//   res.setHeader('Access-Control-Allow-Credentials', 'true')
-
-//   next()
-// })
-
-app.use(cors())
 
 app.use('/', userRoute)
 app.use('/admin', adminRoute)
