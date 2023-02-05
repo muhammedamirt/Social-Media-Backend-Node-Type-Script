@@ -14,7 +14,8 @@ dotenv.config()
 const app: Application = express()
 
 app.use(cors({
-  origin: 'https://www.woulddo.iworldecart.shop'
+  origin: 'https://www.woulddo.iworldecart.shop',
+  credentials: true
 }))
 
 app.use(express.json())
