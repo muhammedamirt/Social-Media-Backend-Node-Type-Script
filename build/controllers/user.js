@@ -63,25 +63,30 @@ exports.default = {
     }),
     postLogin: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         console.log('login ', req.body);
-        const { email, password } = req.body;
-        const userData = yield User_1.default.findOne({ email });
-        if (userData == null) {
-            res.json({ message: "This email don't have any account", emailError: true });
-        }
-        else {
-            const passwordVerify = yield bcrypt_1.default.compare(password, userData === null || userData === void 0 ? void 0 : userData.password);
-            if (passwordVerify) {
-                userData.isLogged = true;
-                yield userData.save();
-                const jwtVerificationToken = (0, jsonwebtoken_1.generateToken)({ id: userData._id.toString() }, '30m');
-                res.status(200).cookie('userAuthentication', jwtVerificationToken, {
-                    httpOnly: false,
-                    maxAge: 600 * 1000
-                }).json({ message: 'login success', success: true, token: jwtVerificationToken, id: userData === null || userData === void 0 ? void 0 : userData._id });
+        try {
+            const { email, password } = req.body;
+            const userData = yield User_1.default.findOne({ email });
+            if (userData == null) {
+                res.json({ message: "This email don't have any account", emailError: true });
             }
             else {
-                res.json({ message: 'Wrong Password', passwordError: true });
+                const passwordVerify = yield bcrypt_1.default.compare(password, userData === null || userData === void 0 ? void 0 : userData.password);
+                if (passwordVerify) {
+                    userData.isLogged = true;
+                    yield userData.save();
+                    const jwtVerificationToken = (0, jsonwebtoken_1.generateToken)({ id: userData._id.toString() }, '30m');
+                    res.status(200).cookie('userAuthentication', jwtVerificationToken, {
+                        httpOnly: false,
+                        maxAge: 600 * 1000
+                    }).json({ message: 'login success', success: true, token: jwtVerificationToken, id: userData === null || userData === void 0 ? void 0 : userData._id });
+                }
+                else {
+                    res.json({ message: 'Wrong Password', passwordError: true });
+                }
             }
+        }
+        catch (error) {
+            res.status(500).json(error);
         }
     }),
     verifyEmail: (req, res) => __awaiter(void 0, void 0, void 0, function* () {

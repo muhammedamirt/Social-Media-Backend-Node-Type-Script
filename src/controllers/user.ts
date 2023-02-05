@@ -61,23 +61,27 @@ export default {
   },
   postLogin: async (req: Request, res: Response) => {
     console.log('login ', req.body)
-    const { email, password }: { email: string, password: string } = req.body
-    const userData = await User.findOne({ email })
-    if (userData == null) {
-      res.json({ message: "This email don't have any account", emailError: true })
-    } else {
-      const passwordVerify: boolean = await bcrypt.compare(password, userData?.password)
-      if (passwordVerify) {
-        userData.isLogged = true
-        await userData.save()
-        const jwtVerificationToken = generateToken({ id: userData._id.toString() }, '30m')
-        res.status(200).cookie('userAuthentication', jwtVerificationToken, {
-          httpOnly: false,
-          maxAge: 600 * 1000
-        }).json({ message: 'login success', success: true, token: jwtVerificationToken, id: userData?._id })
+    try {
+      const { email, password }: { email: string, password: string } = req.body
+      const userData = await User.findOne({ email })
+      if (userData == null) {
+        res.json({ message: "This email don't have any account", emailError: true })
       } else {
-        res.json({ message: 'Wrong Password', passwordError: true })
+        const passwordVerify: boolean = await bcrypt.compare(password, userData?.password)
+        if (passwordVerify) {
+          userData.isLogged = true
+          await userData.save()
+          const jwtVerificationToken = generateToken({ id: userData._id.toString() }, '30m')
+          res.status(200).cookie('userAuthentication', jwtVerificationToken, {
+            httpOnly: false,
+            maxAge: 600 * 1000
+          }).json({ message: 'login success', success: true, token: jwtVerificationToken, id: userData?._id })
+        } else {
+          res.json({ message: 'Wrong Password', passwordError: true })
+        }
       }
+    } catch (error) {
+      res.status(500).json(error)
     }
   },
   verifyEmail: async (req: Request, res: Response) => {
