@@ -18,7 +18,7 @@ const reportPostRoute_1 = __importDefault(require("./routes/reportPostRoute"));
 const body_parser_1 = __importDefault(require("body-parser"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-app.options('*', (0, cors_1.default)());
+app.options('https://www.woulddo.iworldecart.shop', (0, cors_1.default)());
 app.use(express_1.default.json());
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: false }));

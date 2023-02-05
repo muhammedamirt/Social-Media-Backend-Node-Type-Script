@@ -13,7 +13,7 @@ import bodyParser from 'body-parser'
 dotenv.config()
 const app: Application = express()
 
-app.options('*', cors())
+app.options('https://www.woulddo.iworldecart.shop', cors())
 
 app.use(express.json())
 app.use(bodyParser.json())
