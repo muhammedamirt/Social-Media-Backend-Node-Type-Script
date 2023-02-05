@@ -17,13 +17,13 @@ app.use(express.json())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 
-app.use(cors({
-  origin: ['https://www.woulddo.iworldecart.shop/'],
-  methods: ['GET', 'POST', 'DELETE', 'PUT'],
-  credentials: true
-}))
+// app.use(cors({
+//   origin: ['https://www.woulddo.iworldecart.shop/'],
+//   methods: ['GET', 'POST', 'DELETE', 'PUT'],
+//   credentials: true
+// }))
 
-// app.use(cors())
+app.use(cors())
 
 // app.use(function (req, res, next) {
 //   // Website you wish to allow to connect

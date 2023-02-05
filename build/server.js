@@ -9,7 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
-// import cors from 'cors'
+const cors_1 = __importDefault(require("cors"));
 const user_1 = __importDefault(require("./routes/user"));
 const admin_1 = __importDefault(require("./routes/admin"));
 const chatRoute_1 = __importDefault(require("./routes/chatRoute"));
@@ -21,22 +21,22 @@ const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: false }));
-// app.use(cors({
-//   origin: ['https://www.woulddo.iworldecart.shop/'],
-//   methods: ['GET', 'POST', 'DELETE', 'PUT'],
-//   credentials: true
-// }))
+app.use((0, cors_1.default)({
+    origin: ['https://www.woulddo.iworldecart.shop/'],
+    methods: ['GET', 'POST', 'DELETE', 'PUT'],
+    credentials: true
+}));
 // app.use(cors())
-app.use(function (req, res, next) {
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'https://www.woulddo.iworldecart.shop/');
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    // Pass to next layer of middleware
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    next();
-});
+// app.use(function (req, res, next) {
+//   // Website you wish to allow to connect
+//   res.setHeader('Access-Control-Allow-Origin', 'https://www.woulddo.iworldecart.shop/')
+//   // Request methods you wish to allow
+//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+//   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+//   // Pass to next layer of middleware
+//   res.setHeader('Access-Control-Allow-Credentials', 'true')
+//   next()
+// })
 app.use('/', user_1.default);
 app.use('/admin', admin_1.default);
 app.use('/chat', chatRoute_1.default);
