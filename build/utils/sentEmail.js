@@ -32,9 +32,10 @@ const sendEmail = (email, subject, text) => __awaiter(void 0, void 0, void 0, fu
             subject,
             text
         });
+        console.log('email sent success full');
     }
     catch (error) {
-        return error;
+        console.log(error);
     }
 });
 exports.default = sendEmail;
