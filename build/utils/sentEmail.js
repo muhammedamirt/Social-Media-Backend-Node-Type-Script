@@ -9,6 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable no-extra-boolean-cast */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const dotenv_1 = require("dotenv");
 (0, dotenv_1.config)();
@@ -28,10 +30,18 @@ const sendEmail = (email, subject, text) => __awaiter(void 0, void 0, void 0, fu
         //   }
         // })
         const oauth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET_ID, 'https://www.wouldoback.iworldecart.shop');
-        const accessToken = oauth2Client.getAccessToken();
         oauth2Client.setCredentials({
             refresh_token: 'nodemailerrefreshtocken'
         });
+        oauth2Client.on('tokens', (tokens) => {
+            if (Boolean(tokens.refresh_token)) {
+                tokens.refresh_token;
+            }
+            console.log('New access token:', tokens.access_token);
+            // Update the OAuth2 client with the new access token
+            oauth2Client.setCredentials(tokens);
+        });
+        const accessToken = oauth2Client.getAccessToken();
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable no-extra-boolean-cast */
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { config } from 'dotenv'
 config()
@@ -22,10 +24,18 @@ const sendEmail = async (email: string, subject: string, text: string) => {
       process.env.GOOGLE_CLIENT_SECRET_ID,
       'https://www.wouldoback.iworldecart.shop'
     )
-    const accessToken = oauth2Client.getAccessToken()
     oauth2Client.setCredentials({
       refresh_token: 'nodemailerrefreshtocken'
     })
+    oauth2Client.on('tokens', (tokens: { refresh_token: any, access_token: any }) => {
+      if (Boolean(tokens.refresh_token)) {
+        tokens.refresh_token
+      }
+      console.log('New access token:', tokens.access_token)
+      // Update the OAuth2 client with the new access token
+      oauth2Client.setCredentials(tokens)
+    })
+    const accessToken = oauth2Client.getAccessToken()
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
