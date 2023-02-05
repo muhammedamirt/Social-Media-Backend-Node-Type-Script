@@ -13,12 +13,13 @@ import bodyParser from 'body-parser'
 dotenv.config()
 const app: Application = express()
 
-app.options('https://www.woulddo.iworldecart.shop', cors())
-
 app.use(express.json())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cors())
+app.options('https://www.woulddo.iworldecart.shop', cors({
+  credentials: true
+}))
 
 app.use('/', userRoute)
 app.use('/admin', adminRoute)
