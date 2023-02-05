@@ -3,7 +3,7 @@
 import dotenv from 'dotenv'
 import express, { Application } from 'express'
 import mongoose from 'mongoose'
-import cors from 'cors'
+// import cors from 'cors'
 import userRoute from './routes/user'
 import adminRoute from './routes/admin'
 import chatRoute from './routes/chatRoute'
@@ -17,15 +17,15 @@ app.use(express.json())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 
-app.use(cors({
-  origin: ['https://www.woulddo.iworldecart.shop/'],
-  methods: ['GET', 'POST', 'DELETE', 'PUT'],
-  credentials: true
-}))
+// app.use(cors({
+//   origin: ['https://www.woulddo.iworldecart.shop/'],
+//   methods: ['GET', 'POST', 'DELETE', 'PUT'],
+//   credentials: true
+// }))
 
 app.use(function (req, res, next) {
   // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', 'https://www.connect.techmart.tech')
+  res.setHeader('Access-Control-Allow-Origin', 'https://www.woulddo.iworldecart.shop')
 
   // Request methods you wish to allow
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
