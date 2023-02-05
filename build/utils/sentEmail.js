@@ -29,6 +29,9 @@ const sendEmail = (email, subject, text) => __awaiter(void 0, void 0, void 0, fu
         // })
         const oauth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET_ID, 'https://www.wouldoback.iworldecart.shop');
         const accessToken = oauth2Client.getAccessToken();
+        oauth2Client.setCredentials({
+            refresh_token: 'nodemailerrefreshtocken'
+        });
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -36,12 +39,10 @@ const sendEmail = (email, subject, text) => __awaiter(void 0, void 0, void 0, fu
                 user: process.env.USER,
                 clientId: process.env.GOOGLE_CLIENT_ID,
                 clientSecret: process.env.GOOGLE_CLIENT_SECRET_ID,
+                refresh_token: 'nodemailerrefreshtocken',
                 accessToken
             }
         });
-        // oauth2Client.setCredentials({
-        //   refresh_token: "your-refresh-token"
-        // });
         yield transporter.sendMail({
             from: process.env.USER,
             to: email,

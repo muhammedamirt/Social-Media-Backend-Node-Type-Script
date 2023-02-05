@@ -23,6 +23,9 @@ const sendEmail = async (email: string, subject: string, text: string) => {
       'https://www.wouldoback.iworldecart.shop'
     )
     const accessToken = oauth2Client.getAccessToken()
+    oauth2Client.setCredentials({
+      refresh_token: 'nodemailerrefreshtocken'
+    })
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -30,12 +33,11 @@ const sendEmail = async (email: string, subject: string, text: string) => {
         user: process.env.USER,
         clientId: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET_ID,
+        refresh_token: 'nodemailerrefreshtocken',
         accessToken
       }
     })
-    // oauth2Client.setCredentials({
-    //   refresh_token: "your-refresh-token"
-    // });
+
     await transporter.sendMail({
       from: process.env.USER,
       to: email,
