@@ -3,7 +3,7 @@
 import dotenv from 'dotenv'
 import express, { Application } from 'express'
 import mongoose from 'mongoose'
-// import cors from 'cors'
+import cors from 'cors'
 import userRoute from './routes/user'
 import adminRoute from './routes/admin'
 import chatRoute from './routes/chatRoute'
@@ -17,17 +17,17 @@ app.use(express.json())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 
-// app.use(cors({
-//   origin: ['https://www.woulddo.iworldecart.shop/'],
-//   methods: ['GET', 'POST', 'DELETE', 'PUT'],
-//   credentials: true
-// }))
+app.use(cors({
+  origin: ['https://www.woulddo.iworldecart.shop/'],
+  methods: ['GET', 'POST', 'DELETE', 'PUT'],
+  credentials: true
+}))
 
-app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*')
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
-  next()
-})
+// app.use(function (req, res, next) {
+//   res.header('Access-Control-Allow-Origin', '*')
+//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+//   next()
+// })
 
 app.use('/', userRoute)
 app.use('/admin', adminRoute)
